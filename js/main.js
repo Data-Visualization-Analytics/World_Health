@@ -70,6 +70,30 @@ g.append("g")
     .attr("class", "y axis")
     .call(yAxisCall);
 
+//Legends
+var continents = ["Asia","europe","americas","africa"];
+
+var legend = g.append("g")
+            .attr("transform","translate (" + (width-10) + "," +
+            (height-125) + ")"); 
+
+continents.forEach((continents,i) => {
+    var legendRow = legend.append("g")
+            .attr("transform","translate (0, " + (i*20) + ")");
+    
+            legendRow.append("rect")
+                .attr("width",10)
+                .attr("height",10)
+                .attr("fill", continentColor(continents));
+
+            legendRow.append("text")
+                .attr("x", -10)
+                .attr("y", 10)
+                .attr("text-anchor", "end")
+                .style("text-transform", "capitalize")
+                .text(continents);
+});
+
 d3.json("data/data.json").then(function(data){
     
 
