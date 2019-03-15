@@ -90,7 +90,7 @@ g.append("g")
     .call(yAxisCall);
 
 //Legends
-var continents = ["Asia","europe","americas","africa"];
+var continents = ["asia","europe","americas","africa"];
 
 var legend = g.append("g")
             .attr("transform","translate (" + (width-10) + "," +
@@ -120,7 +120,7 @@ d3.json("data/data.json").then(function(data){
     const formattedData = data.map(function(year){
         return year["countries"].filter(function(country){
             var dataExists = (country.income && country.life_exp);
-            return dataExists
+            return dataExists;
         }).map(function(country){
             country.income = +country.income;
             country.life_exp = +country.life_exp;
