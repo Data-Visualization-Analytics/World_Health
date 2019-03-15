@@ -11,6 +11,18 @@ var g = d3.select("#chart-area")
             ", " + margin.top + ")");
 
 var time = 0;
+//Tooltip
+/*var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
+{continent: "europe", country: "Portugal", income: 1687, life_exp: 35.6, population: 3136245}
+
+*/
+
+var tip = d3.tip()
+.attr("class", "d3-tip")
+.offset([-8, 0])
+.html(function(d) {  return "Continent : " + d.continent+"<br> Country : "+d.country+"<br/>Income : "+d.income +"<br> Population : "+d.population });
+
+g.call(tip);
 
 // Scales
 var x = d3.scaleLog()
@@ -140,6 +152,8 @@ function update(data) {
     circles.enter()
         .append("circle")
         .attr("class", "enter")
+        .on("mouseover", tip.show)
+        .on("mouseout", tip.hide)
         .attr("fill", function(d) { return continentColor(d.continent); })
 		.attr("stroke", function(d) { return d3.rgb(continentColor(d.continent)).darker() })
 		.merge(circles)
