@@ -11,11 +11,8 @@ var g = d3.select("#chart-area")
             ", " + margin.top + ")");
 
 var time = 0;
-//Tooltip
-/*var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
-{continent: "europe", country: "Portugal", income: 1687, life_exp: 35.6, population: 3136245}
-
-*/
+var interval;
+var formattedData;
 
 var tip = d3.tip()
 .attr("class", "d3-tip")
@@ -25,7 +22,7 @@ var tip = d3.tip()
     text += "<strong>Continent : </strong> <span style='color:red;text-transform:capitalize';>" + d.continent + "</span><br/>";
     text += "<strong>Life Expectancy : </strong> <span style='color:red'>" + d3.format(".2f")(d.life_exp) + "</span><br/>";
     text += "<strong>GDP per Capita : </strong> <span style='color:red'>" + d3.format("$,.0f")(d.income) + "</span><br/>";
-    text += "<strong>Population : </strong> <span style='color:red'>" + d3.format(",.0f")(d.population) + "</span><br/>";
+    text += "<strong>Population : </strong> <span style='color:red'>" + d3.format(",.2s")(d.population) + "</span><br/>";
     return text;
 });
 
@@ -102,9 +99,13 @@ continents.forEach((continents,i) => {
     
             legendRow.append("rect")
                 .attr("width",10)
+                .attr("rx",5)
                 .attr("height",10)
-                .attr("fill", continentColor(continents));
-
+                .attr("class", 'legends_'+continents)
+                .attr("fill", continentColor(continents))
+                .on("mouseover", function() { fade(continents); })
+                .on("mouseout", function() { fade('clear');  });
+                
             legendRow.append("text")
                 .attr("x", -10)
                 .attr("y", 10)
@@ -113,11 +114,27 @@ continents.forEach((continents,i) => {
                 .text(continents);
 });
 
+
+function fade(params) {
+
+  if (params!='clear'){
+    d3.selectAll('circle').attr('opacity',function(d) { return (d.continent==params)? 1.0 :0.1 });
+  }
+  else{
+    d3.selectAll('circle').attr('opacity', 1 );
+
+  }
+  return 'faded'
+
+  
+}
+
+
 d3.json("data/data.json").then(function(data){
     
 
     // Clean data
-    const formattedData = data.map(function(year){
+    formattedData = data.map(function(year){
         return year["countries"].filter(function(country){
             var dataExists = (country.income && country.life_exp);
             return dataExists;
@@ -128,23 +145,79 @@ d3.json("data/data.json").then(function(data){
         })
     });
 	
-    // Run the code every 0.2 second
-    d3.interval(function(){
-        // At the end of our data, loop back
-        time = (time < 214) ? time+1 : 0
-        update(formattedData[time]);            
-	}, 150);
 	
     // First run of the visualization
     update(formattedData[0]);
 
-})
+  
 
+   
+
+})
+        
+function range(start, end) {
+    return Array(end - start + 1).fill().map((_, idx) => start + idx)
+  }
+  var result = range(0, 214); // [9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+
+    var select_box = d3.select('#year-select')
+    .selectAll("option")
+        .data(result.reverse()) 
+        .enter().append("option")
+        .attr("value", function (d) { return d })
+        .attr("class","name")
+        .attr("selected","")
+        .text(function (d) { return parseInt(d)+1800 });
+
+$('#continent-select').on('change', function() {
+    update(formattedData[time]);
+  });
+
+  $('#year-select').on('change', function() {
+      time = parseInt($('#year-select').val());
+
+       update(formattedData[$('#year-select').val()]);
+       clearInterval(interval);
+       $("#play-button").text("Play");
+  });
+
+$("#play-button")
+    .on("click",function(){
+        var button = $(this);
+        
+        if(button.text() == "Play"){
+            button.text("Pause");
+            interval = setInterval(step, 100);
+        }
+        else{
+            button.text("Play");
+            clearInterval(interval);
+        }
+    })
+
+$("#reset-button")
+    .on("click", function(){
+        time=0;
+        update(formattedData[0]);
+    })
+
+function step(){
+    time = (time < 214) ? time+1 : 0
+    update(formattedData[time]);            
+}
 function update(data) {
     // Standard transition time for the visualization
     var t = d3.transition()
         .duration(100);
 
+    var continent = $("#continent-select")
+    .val();
+    var data = data.filter(function(d){
+        if(continent == "all"){return true;}
+        else{
+            return d.continent == continent;
+        }
+    })
     // JOIN new data with old elements.
     var circles = g.selectAll("circle").data(data, function(d){
         return d.country;
@@ -159,6 +232,7 @@ function update(data) {
     circles.enter()
         .append("circle")
         .attr("class", "enter")
+        .attr("sub_class", function(d) { return d.continent })
         .on("mouseover", tip.show)
         .on("mouseout", tip.hide)
         .attr("fill", function(d) { return continentColor(d.continent); })
