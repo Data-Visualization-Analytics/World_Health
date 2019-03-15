@@ -22,10 +22,10 @@ var tip = d3.tip()
 .offset([-8, 0])
 .html(function(d) {  
     var text = "<strong>Country : </strong> <span style='color:red'>" + d.country + "</span><br/>";
-    text += "<strong>Continent : </strong> <span style='color:red'>" + d.continent + "</span><br/>";
-    text += "<strong>Life Expectancy : </strong> <span style='color:red'>" + d.life_exp + "</span><br/>";
-    text += "<strong>GDP per Capita : </strong> <span style='color:red'>" + d.income + "</span><br/>";
-    text += "<strong>Population : </strong> <span style='color:red'>" + d.population + "</span><br/>";
+    text += "<strong>Continent : </strong> <span style='color:red;text-transform:capitalize';>" + d.continent + "</span><br/>";
+    text += "<strong>Life Expectancy : </strong> <span style='color:red'>" + d3.format(".2f")(d.life_exp) + "</span><br/>";
+    text += "<strong>GDP per Capita : </strong> <span style='color:red'>" + d3.format("$,.0f")(d.income) + "</span><br/>";
+    text += "<strong>Population : </strong> <span style='color:red'>" + d3.format(",.0f")(d.population) + "</span><br/>";
     return text;
 });
 
