@@ -30,6 +30,5 @@ designing health programmes.
 
 This overview summarizes the principal findings of the
 World health statistics 2019. The full report can be accessed
-at https://www.who.int/gho/publications/world_health_
-statistics/2019/en/
+at https://www.who.int/gho/publications/world_health_statistics
 
